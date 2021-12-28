@@ -66,6 +66,37 @@ def break_timer(minutes=1, message=""):
                             background = "red",
                             foreground = "white")
 
+    def change_color(colorscheme):
+        # global SCHOOL
+        # SCHOOL = colorscheme
+        # if colorscheme:
+        #     root['bg'] = colors[SCHOOL]['primary']
+        #     lblMessage.config(
+        #         background=colors[SCHOOL]['primary'],
+        #         foreground=colors[SCHOOL]['secondary'])
+        #     lblTimeNow.config(
+        #         background=colors[SCHOOL]['primary'],
+        #         foreground=colors[SCHOOL]['secondary'])
+        #     lblTimeLeft.config(
+        #         background=colors[SCHOOL]['primary'],
+        #         foreground=colors[SCHOOL]['secondary'])
+        #     lblTimeEnd.config(
+        #         background=colors[SCHOOL]['primary'],
+        #         foreground=colors[SCHOOL]['secondary'])
+        return
+
+    def makemenu():
+
+        menu = Menu(root)
+        root.config(menu=menu)
+        opts_menu = Menu(menu, tearoff=0)
+        opts_sub_menu = Menu(opts_menu, tearoff=0)
+
+        menu.add_cascade(label="Options", menu=opts_menu)
+        opts_menu.add_cascade(label="Color Scheme", menu=opts_sub_menu)
+        for colorscheme in colors:
+            opts_sub_menu.add_command(label=f"{colorscheme}", command=change_color(colorscheme))
+        return
 
     # Function to update the timer
     def settimelabel():
@@ -111,7 +142,7 @@ def break_timer(minutes=1, message=""):
 
     # Set the initial label times.
     settimelabel()
-
+    makemenu()
     root.after(1000, settimelabel)
     mainloop()
 

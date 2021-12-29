@@ -6,11 +6,12 @@ import sys
 import datetime as dt
 
 # Global Variables
-SCHOOL = 'Miami'
+SCHOOL = 'NYU'
 colors = {
     'Miami': {'primary': 'orange', 'secondary': 'white'},
     'PSU':   {'primary': 'blue',   'secondary': 'white'},
-    'Michigan': {'primary': 'darkblue', 'secondary': 'yellow'}
+    'Michigan': {'primary': 'darkblue', 'secondary': 'yellow'},
+    'NYU': {'primary': '#57068C', 'secondary': 'white'}  # purple/white
 }
 FONT = 'Courier'
 FONTSIZE = 60

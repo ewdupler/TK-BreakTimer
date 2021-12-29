@@ -1,42 +1,75 @@
+"""
+2021-12-28 - E. Dupler - Added exit to "ok()"
+                       - Changed options for menu
+                       - Reformatted menu
+                       - Configured with functions
+"""
 from tkinter import *
-from tkinter.ttk import *
+import tkinter.messagebox
 
-OPTIONS = [
-"Jan",
-"Feb",
-"Mar"
-]
-def Donothing():
-    return
+hello = None
+root = None
+message = None
 
-root = Tk()
+def main():
+    global root
 
-hello = StringVar()
-hello.set("Hello World")
+    root = Tk()
 
-message = Label(root, textvariable=hello)
-message.pack()
-variable = StringVar(root)
-variable.set(OPTIONS[0]) # default value
+    make_menu(root)
+    make_message_label(root)
 
-menu = Menu(root)
-root.config(menu=menu)
-opts_menu = Menu(menu, tearoff=0)
-opts_sub_menu = Menu(opts_menu, tearoff=0)
+    button = tkinter.Button(root, text="OK", command=ok)
+    button.pack()
 
-menu.add_cascade(label="Options", menu=opts_menu)
-opts_menu.add_cascade(label="Colors", menu=opts_sub_menu)
-opts_sub_menu.add_command(label="Do Nothing", command=Donothing)
+    mainloop()
+
+
+def make_message_label(root):
+    global hello
+    global message
+    hello = StringVar()
+    hello.set("Hello World")
+    message = tkinter.Label(root, textvariable=hello)
+    message.pack()
+    root.bind(message)
+
+
+def make_menu(root):
+    """
+    Create Menu
+    """
+    menu = Menu(root)
+    root.config(menu=menu)
+    root.geometry("500x200")
+    # Program Menu
+    program_menu = Menu(menu, tearoff=0)
+    menu.add_cascade(label="Program", menu=program_menu)
+    program_menu.add_command(label="Exit", command=lambda: root.destroy())
+    # Options Menu
+    opts_menu = Menu(menu, tearoff=0)
+    opts_sub_menu = Menu(opts_menu, tearoff=0)
+    menu.add_cascade(label="Options", menu=opts_menu)
+    opts_menu.add_cascade(label="Colors", menu=opts_sub_menu)
+    # Options submenu
+    opts_sub_menu.add_command(label='Miami', command=lambda: set_colors('orange', 'green'))
+    opts_sub_menu.add_command(label='Michigan', command=lambda: set_colors('blue', 'yellow'))
+    opts_sub_menu.add_command(label='PSU', command=lambda: set_colors('blue', 'white'))
 
 
 def ok():
-    print ("value is:" + variable.get())
-
-button = Button(root, text="OK", command=ok)
-button.pack()
-
-root.bind(message)
+    print("value is:" + hello.get())
+    root.destroy()
 
 
+def set_colors(bgcolor, fgcolor):
+    """ This code will set the background color of the root window. """
+    global message
+    global hello
+    root['bg'] = bgcolor
+    message.config(bg=bgcolor, fg=fgcolor)
+    return
 
-mainloop()
+
+if __name__ == "__main__":
+    main()

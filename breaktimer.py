@@ -5,8 +5,16 @@ from tkinter.ttk import *
 import sys
 import datetime as dt
 
+# Only play music if the module exists for import
+try:
+    import music
+    playmusic = True
+except ImportError:
+    playmusic = False
+
+
 # Global Variables
-SCHOOL = 'NYU'
+SCHOOL = 'Miami'
 colors = {
     'Miami': {'primary': 'orange', 'secondary': 'white'},
     'PSU':   {'primary': 'blue',   'secondary': 'white'},
@@ -40,8 +48,23 @@ def main():
         print(f"Error detected: {e}")
         sys.exit(1)
 
+    # Uncomment to default to starting with music
+    # if playmusic:
+    #     play_sound()
+
     break_timer(minutes, message)
 
+    if playmusic:
+        play_sound('off')
+
+def play_sound(command='on'):
+    global sound
+
+    if command == 'on':
+        sound = music.songtime()
+        sound.loop()
+    else:
+        sound.stop()
 
 def break_timer(minutes=1, message=""):
     timenow = dt.datetime.now()
@@ -68,35 +91,47 @@ def break_timer(minutes=1, message=""):
                             foreground = "white")
 
     def change_color(colorscheme):
-        # global SCHOOL
-        # SCHOOL = colorscheme
-        # if colorscheme:
-        #     root['bg'] = colors[SCHOOL]['primary']
-        #     lblMessage.config(
-        #         background=colors[SCHOOL]['primary'],
-        #         foreground=colors[SCHOOL]['secondary'])
-        #     lblTimeNow.config(
-        #         background=colors[SCHOOL]['primary'],
-        #         foreground=colors[SCHOOL]['secondary'])
-        #     lblTimeLeft.config(
-        #         background=colors[SCHOOL]['primary'],
-        #         foreground=colors[SCHOOL]['secondary'])
-        #     lblTimeEnd.config(
-        #         background=colors[SCHOOL]['primary'],
-        #         foreground=colors[SCHOOL]['secondary'])
+        global SCHOOL
+        SCHOOL = colorscheme
+        if colorscheme:
+            root['bg'] = colors[SCHOOL]['primary']
+            lblMessage.config(
+                background=colors[SCHOOL]['primary'],
+                foreground=colors[SCHOOL]['secondary'])
+            lblTimeNow.config(
+                background=colors[SCHOOL]['primary'],
+                foreground=colors[SCHOOL]['secondary'])
+            lblTimeLeft.config(
+                background=colors[SCHOOL]['primary'],
+                foreground=colors[SCHOOL]['secondary'])
+            lblTimeEnd.config(
+                background=colors[SCHOOL]['secondary'],
+                foreground=colors[SCHOOL]['primary'])
+        print(colorscheme)
         return
 
     def makemenu():
 
         menu = Menu(root)
         root.config(menu=menu)
+
+        ## Options Submenu
         opts_menu = Menu(menu, tearoff=0)
         opts_sub_menu = Menu(opts_menu, tearoff=0)
 
         menu.add_cascade(label="Options", menu=opts_menu)
         opts_menu.add_cascade(label="Color Scheme", menu=opts_sub_menu)
+
         for colorscheme in colors:
-            opts_sub_menu.add_command(label=f"{colorscheme}", command=change_color(colorscheme))
+            opts_sub_menu.add_command(label=f"{colorscheme}", command=lambda c=colorscheme: change_color(c))
+
+        ## Sound Submenu
+        # sound_menu = Menu(menu, tearoff=0)
+        sound_sub_menu = Menu(opts_sub_menu, tearoff=0)
+        opts_menu.add_cascade(label="Sound", menu=sound_sub_menu)
+        sound_sub_menu.add_command(label="On",  command=lambda c='on': play_sound(c))
+        sound_sub_menu.add_command(label="Off", command=lambda c='off': play_sound(c))
+
         return
 
     # Function to update the timer

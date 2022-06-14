@@ -14,20 +14,39 @@ except ImportError:
 
 
 # Global Variables
-SCHOOL = 'Miami'
+SCHOOL = 'Neutral'
 colors = {
+    'Neutral': {'primary':'darkgray', 'secondary': 'white'},
     'Miami': {'primary': 'orange', 'secondary': 'white'},
     'PSU':   {'primary': 'blue',   'secondary': 'white'},
     'Michigan': {'primary': 'darkblue', 'secondary': 'yellow'},
     'NYU': {'primary': '#57068C', 'secondary': 'white'}  # purple/white
 }
+presetMessages = [
+    "Break Time!",
+    "Lab 1",
+    "Lab 2",
+    "Lab 3",
+    "Lab 4",
+    "Lab 5",
+    "Lunch"
+]
+minutesAdd = [1, 5, 10]
+minutesTotal = [1, 5, 10, 20, 30, 50]
+
 FONT = 'Courier'
 FONTSIZE = 60
 DONE_MESSAGE = "TIME IS UP!"
+is_sound_playing = False
+
+starttime = dt.datetime.now()
 
 def main():
-    message = input("Timer message (enter for none): ")
-    minutes = input("Minutes for break/or end time (HH:MM - 24hr): ")
+    # message = input("Timer message (enter for none): ")
+    # minutes = input("Minutes for break/or end time (HH:MM - 24hr): ")
+    message = "Break Time!"
+    minutes = "5"
+
     try:
         if ":" in minutes:
             # If a time is given, convert it to minutes instead.
@@ -55,20 +74,50 @@ def main():
     break_timer(minutes, message)
 
     if playmusic:
-        play_sound('off')
+        try:
+            play_sound('off')
+        except:
+            pass
+
 
 def play_sound(command='on'):
     global sound
+    global is_sound_playing
 
     if command == 'on':
+        # Loops the selected music
         sound = music.songtime()
         sound.loop()
+        is_sound_playing = True
+    elif command == 'alarm':
+        # Stops the music and plays the alarm
+        play_sound('stop')
+        sound = music.songtime()
+        sound.playend()
     else:
         sound.stop()
+        is_sound_playing = False
+
+def add_minutes(minutes=1):
+    global timeend
+    timeend = timeend + dt.timedelta(minutes=minutes)
+    return
+
+def total_minutes(minutes=1):
+    global timeend
+    timeend = starttime + dt.timedelta(minutes=minutes)
+    timeepoch = (((int(timeend.timestamp())) + 30) // 60) * 60
+    timeend = dt.datetime.fromtimestamp(timeepoch)
+    return
 
 def break_timer(minutes=1, message=""):
-    timenow = dt.datetime.now()
+    timenow = starttime
+    global timeend
     timeend = timenow + dt.timedelta(minutes=minutes)
+    timeepoch = (((int(timeend.timestamp())) + 30) // 60) * 60
+    timeend = dt.datetime.fromtimestamp(timeepoch)
+
+    lblMessage=""
 
     # Set up Graphical app via TkInter
     root = Tk()
@@ -77,6 +126,10 @@ def break_timer(minutes=1, message=""):
 
     # Do this when the break is over
     def timer_complete():
+        if is_sound_playing:
+            print("Sound alarm")
+            play_sound('alarm')
+
         root['bg'] = 'red'
         lblMessage.config(background="red",
                           foreground="white")
@@ -107,7 +160,11 @@ def break_timer(minutes=1, message=""):
             lblTimeEnd.config(
                 background=colors[SCHOOL]['secondary'],
                 foreground=colors[SCHOOL]['primary'])
-        print(colorscheme)
+        # print(colorscheme)
+        return
+
+    def setMessage(message=""):
+        lblMessage.config(text=f"{message}")
         return
 
     def makemenu():
@@ -132,15 +189,38 @@ def break_timer(minutes=1, message=""):
         sound_sub_menu.add_command(label="On",  command=lambda c='on': play_sound(c))
         sound_sub_menu.add_command(label="Off", command=lambda c='off': play_sound(c))
 
+        ## Time Add Menu
+        time_menu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Time", menu=time_menu)
+        time_sub_menu = Menu(time_menu, tearoff=0)
+        time_menu.add_cascade(label="Add", menu=time_sub_menu)
+        for min in minutesAdd:
+            time_sub_menu.add_command(label=f"{min} min", command=lambda c=min: add_minutes(c))
+        ttot_sub_menu = Menu(time_menu, tearoff=0)
+        time_menu.add_cascade(label="Total Time", menu=ttot_sub_menu)
+        for min in minutesTotal:
+            ttot_sub_menu.add_command(label=f"{min} min", command=lambda c=min: total_minutes(c))
+
+        ## Message Menu
+        msg_menu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Message", menu=msg_menu)
+        for message in presetMessages:
+            msg_menu.add_command(label=f"{message}", command=lambda c=f"{message}": setMessage(c))
+
+
+
         return
 
     # Function to update the timer
     def settimelabel():
         timenow = dt.datetime.now()
         timeleft = timeend - timenow
-        if timeleft.seconds > 0:
+        # if timeleft.seconds > 0:
+        if timeend > timenow:
             lblTimeNow.config(text=f"Now: {timenow.strftime('%I:%M:%S %p')}")
-            lblTimeLeft.config(text=f"Remaining: {timeleft.seconds}s")
+            # Set the time label (assumption less than 1 hour)
+            lblTimeLeft.config(text=f"Remaining: {timeleft.seconds // 60}:{timeleft.seconds % 60:02}")
+
             lblTimeEnd.config(text=f"Return: {timeend.strftime('%I:%M:%S %p')}")
 
             root.after(1000, settimelabel)
@@ -151,7 +231,8 @@ def break_timer(minutes=1, message=""):
     lblMessage = Label(root, font=(FONT, int(FONTSIZE * 1.25), 'bold'),
                        background=colors[SCHOOL]['primary'],
                        foreground=colors[SCHOOL]['secondary'])
-    lblMessage.config(text=f"{message}")
+    # lblMessage.config(text=f"{message}")
+    setMessage(message)
     if message != "":
         # Only display the message if it was specified
         lblMessage.pack(anchor='center')

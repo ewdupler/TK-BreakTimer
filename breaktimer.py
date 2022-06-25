@@ -214,12 +214,22 @@ def break_timer(minutes=1, message=""):
     # Function to update the timer
     def settimelabel():
         timenow = dt.datetime.now()
-        timeleft = timeend - timenow
+        timeleft = timeend - timenow + dt.timedelta(seconds=1)
         # if timeleft.seconds > 0:
         if timeend > timenow:
             lblTimeNow.config(text=f"Now: {timenow.strftime('%I:%M:%S %p')}")
-            # Set the time label (assumption less than 1 hour)
-            lblTimeLeft.config(text=f"Remaining: {timeleft.seconds // 60}:{timeleft.seconds % 60:02}")
+            # Set the time label
+            minutes = timeleft.seconds // 60 % 60
+            hours = ((timeleft.seconds // 60) - minutes) // 60
+
+            # Format label as M:SS if less than an hour.  Otherwise HH:MM:SS
+            if hours < 1:
+                if int(minutes) < 1:
+                    lblTimeLeft.config(text=f"Remaining: {timeleft.seconds % 60}")
+                else:
+                    lblTimeLeft.config(text=f"Remaining: {minutes}:{timeleft.seconds % 60:02}")
+            else:
+                lblTimeLeft.config(text=f"Remaining: {hours:02}:{minutes:02}:{timeleft.seconds % 60:02}")
 
             lblTimeEnd.config(text=f"Return: {timeend.strftime('%I:%M:%S %p')}")
 

@@ -1,5 +1,6 @@
 # importing whole module
 from tkinter import *
+from tkinter import simpledialog
 from tkinter.ttk import *
 
 import sys
@@ -167,6 +168,12 @@ def break_timer(minutes=1, message=""):
         lblMessage.config(text=f"{message}")
         return
 
+    def setCustomMessage():
+        new_message = simpledialog.askstring("Enter your custom message.")
+        if new_message != "":
+            setMessage(new_message)
+        return
+
     def makemenu():
 
         menu = Menu(root)
@@ -206,7 +213,7 @@ def break_timer(minutes=1, message=""):
         menu.add_cascade(label="Message", menu=msg_menu)
         for message in presetMessages:
             msg_menu.add_command(label=f"{message}", command=lambda c=f"{message}": setMessage(c))
-
+        msg_menu.add_command(label="Custom Message", command=setCustomMessage)
 
 
         return

@@ -33,7 +33,8 @@ presetMessages = [
     "Lunch"
 ]
 minutesAdd = [1, 5, 10]
-minutesTotal = [1, 5, 10, 20, 30, 50]
+minutesSub = [1, 5, 10]
+minutesTotal = [1, 5, 10, 15, 20, 30, 50]
 
 FONT = 'Courier'
 FONTSIZE = 60
@@ -169,7 +170,7 @@ def break_timer(minutes=1, message=""):
         return
 
     def setCustomMessage():
-        new_message = simpledialog.askstring("Enter your custom message.")
+        new_message = simpledialog.askstring("Message Box", "Enter your custom message.")
         if new_message != "":
             setMessage(new_message)
         return
@@ -199,10 +200,15 @@ def break_timer(minutes=1, message=""):
         ## Time Add Menu
         time_menu = Menu(menu, tearoff=0)
         menu.add_cascade(label="Time", menu=time_menu)
-        time_sub_menu = Menu(time_menu, tearoff=0)
+        time_sub_menu  = Menu(time_menu, tearoff=0)
+        time_sub_menu2 = Menu(time_menu, tearoff=0)
+
         time_menu.add_cascade(label="Add", menu=time_sub_menu)
         for min in minutesAdd:
             time_sub_menu.add_command(label=f"{min} min", command=lambda c=min: add_minutes(c))
+        time_menu.add_cascade(label="Subtract", menu=time_sub_menu2)
+        for min in minutesSub:
+            time_sub_menu2.add_command(label=f"{min} min", command=lambda c=(min * -1): add_minutes(c))
         ttot_sub_menu = Menu(time_menu, tearoff=0)
         time_menu.add_cascade(label="Total Time", menu=ttot_sub_menu)
         for min in minutesTotal:

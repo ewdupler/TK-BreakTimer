@@ -2,9 +2,12 @@
 from tkinter import *
 from tkinter import simpledialog
 from tkinter.ttk import *
+from tkinter import messagebox
 
 import sys
 import datetime as dt
+
+VERSION = "1.0"
 
 # Only play music if the module exists for import
 try:
@@ -175,6 +178,14 @@ def break_timer(minutes=1, message=""):
             setMessage(new_message)
         return
 
+    def aboutMessage():
+        messagebox.showinfo('About', '(c) 2022 - Eugene Dupler\n\nFree for Educational or non-commercial use.')
+        return
+
+    def version():
+        messagebox.showinfo('Version', f"Version: {VERSION}")
+        return
+
     def makemenu():
 
         menu = Menu(root)
@@ -221,6 +232,11 @@ def break_timer(minutes=1, message=""):
             msg_menu.add_command(label=f"{message}", command=lambda c=f"{message}": setMessage(c))
         msg_menu.add_command(label="Custom Message", command=setCustomMessage)
 
+        ## Info
+        info_menu = Menu(menu, tearoff=0)
+        menu.add_cascade(label="Info", menu=info_menu)
+        info_menu.add_command(label="About", command=aboutMessage)
+        info_menu.add_command(label="Version", command=version)
 
         return
 
